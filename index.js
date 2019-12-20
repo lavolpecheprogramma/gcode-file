@@ -1,4 +1,5 @@
 const { mapRange } = require('canvas-sketch-util/math');
+const {contain} = require('./intrinsic-scale'); 
 
 const defaultConfig = {
 	feedRate: 8000,
@@ -7,7 +8,7 @@ const defaultConfig = {
 	offCommand: 'M03S0',
 	powerDelay: 0.2,
 	fileName: 'sketch.gcode',
-	drawArea: [190, 267], // mm
+	drawArea: [190, 267],
 }
 
 class GCodeFile {
@@ -20,20 +21,34 @@ class GCodeFile {
 	}
 
 	updateCoordsArea(width, height) {
-		this.config.coordsWidth = width
-		this.config.coordsHeight = height
+		this.coordsWidth = width
+		this.coordsHeight = height
+		this.updateDrawCoords()
+	}
+
+	updateDrawCoords(){
+		const {
+			offsetX, 
+			offsetY, 
+			width, 
+			height
+		} = contain(this.config.drawArea[0], this.config.drawArea[1], this.coordsWidth, this.coordsHeight)
+		this.offsetX = offsetX
+		this.offsetY = offsetY
+		this.drawWidth = width
+		this.drawHeight = height
 	}
 
 	mapCoordsToDrawArea(x, y) {
-		if (!this.config.coordsWidth) {
-			throw new Error('Must specify "coordsWidth" option!');
+		if (!this.coordsWidth) {
+			throw new Error('Must call "updateCoordsArea" passing width and height of your coordinate system!');
 		}
-		if (!this.config.coordsHeight) {
-			throw new Error('Must specify "coordsHeight" option!');
+		if (!this.coordsHeight) {
+			throw new Error('Must call "updateCoordsArea" passing width and height of your coordinate system!');
 		}
 		return {
-			x: mapRange(x, 0, this.config.coordsWidth, 0, this.config.drawArea[0], true),
-			y: mapRange(y, 0, this.config.coordsHeight, 0, this.config.drawArea[1], true)
+			x: this.offsetX + mapRange(x, 0, this.coordsWidth, 0, this.drawWidth, true),
+			y: this.offsetY + mapRange(y, 0, this.coordsHeight, 0, this.drawHeight, true)
 		}
 	}
 	
@@ -59,7 +74,7 @@ class GCodeFile {
 		})
 	}
 
-	closeFile = function () {
+	closeFile() {
 		this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nM18`
 	}
 	
