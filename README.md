@@ -14,6 +14,8 @@ const gCode = new GCodeFile({
 	drawArea: [210, 297] // A4 size in mm
 })
 
+// ... your canvas setup ...
+gCode.updateCoordsArea(canvas.width, canvas.height);
 
 const p = createPath();
 p.moveTo(10, 10);
