@@ -1,9 +1,19 @@
 # gcode-file
+
 Create and save a gcode file in browser via javascript
+
+### Installation
+
+You can grab it as an `npm` package
+```bash
+npm i --save @gcode-file
+```
+
+### Example
 
 ```
 const { createPath, pathsToPolylines } = require('canvas-sketch-util/penplot');
-const GCodeFile = require('./utils/gcode-file');
+const GCodeFile = require('gcode-file');
 const gCode = new GCodeFile({
 	feedRate: 8000,
 	seekRate: 8000,

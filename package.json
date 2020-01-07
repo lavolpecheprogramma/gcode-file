@@ -1,0 +1,23 @@
+{
+  "name": "gcode-file",
+  "version": "1.0.0",
+  "description": "Create and save a gcode file in browser via javascript",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lavolpecheprogramma/gcode-file.git"
+  },
+  "keywords": [
+    "gcode",
+    "penplotter"
+  ],
+  "author": "Alberto Parziale",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lavolpecheprogramma/gcode-file/issues"
+  },
+  "homepage": "https://github.com/lavolpecheprogramma/gcode-file#readme",
+  "dependencies": {
+    "canvas-sketch-util": "^1.10.0"
+  }
+}
