@@ -8,7 +8,8 @@ const defaultConfig = {
   offCommand: 'M03S0',
   powerDelay: 0.2,
   fileName: 'sketch.gcode',
-  drawArea: [190, 267],
+  paperSize: [210, 297],
+  margin: 10
 }
 
 class GCodeFile {
@@ -17,7 +18,25 @@ class GCodeFile {
       ...defaultConfig,
       ...config
     }
-    this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90 G21`
+    this.normalizeMargin()
+    this.drawArea = [
+      this.config.paperSize[0] - this.config.margin[0] - this.config.margin[2],
+      this.config.paperSize[1] - this.config.margin[1] - this.config.margin[3]
+    ]
+    this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
+  }
+
+  normalizeMargin(){
+    if(typeof this.config.margin === "number"){
+      this.config.margin = [this.config.margin,this.config.margin,this.config.margin,this.config.margin]
+    }else if(Array.isArray(this.config.margin)){
+      if(this.config.margin.length === 2){
+        this.config.margin[2] = this.config.margin[0]
+        this.config.margin[3] = this.config.margin[1]
+      }
+    }else{
+      throw new Error('Margin option can be a number or an array.')
+    }
   }
 
   updateCoordsArea(width, height) {
@@ -32,7 +51,7 @@ class GCodeFile {
       offsetY,
       width,
       height
-    } = contain(this.config.drawArea[0], this.config.drawArea[1], this.coordsWidth, this.coordsHeight)
+    } = contain(this.drawArea[0], this.drawArea[1], this.coordsWidth, this.coordsHeight)
     this.offsetX = offsetX
     this.offsetY = offsetY
     this.drawWidth = width
@@ -46,15 +65,20 @@ class GCodeFile {
     if (!this.coordsHeight) {
       throw new Error('Must call "updateCoordsArea" passing width and height of your coordinate system!')
     }
-    return {
-      x: this.offsetX + mapRange(x, 0, this.coordsWidth, 0, this.drawWidth, true),
-      y: this.offsetY + mapRange(y, 0, this.coordsHeight, 0, this.drawHeight, true)
+    const coords = {
+      x: this.config.margin[0] + this.offsetX + mapRange(x, 0, this.coordsWidth, 0, this.drawWidth, true),
+      y: this.config.margin[1] + this.offsetY + mapRange(y, 0, this.coordsHeight, 0, this.drawHeight, true)
     }
+    
+    coords.x = parseFloat(coords.x.toFixed(3))
+    coords.y = parseFloat(coords.y.toFixed(3))
+
+    return coords
   }
 
   moveTo(x, y) {
     const coords = this.mapCoordsToDrawArea(x, y)
-    this.gcode += `\n${this.config.offCommand}\nG1 X${coords.x} Y${coords.y}\nG4 P0.2\n${this.config.onCommand}`
+    this.gcode += `\n${this.config.offCommand}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
   }
 
   drawLine(x, y) {
@@ -75,7 +99,7 @@ class GCodeFile {
   }
 
   closeFile() {
-    this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nM18`
+    this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1\nM18`
   }
 
   downloadFile() {
