@@ -1,6 +1,6 @@
 {
   "name": "gcode-file",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Create and save a gcode file in browser via javascript",
   "main": "index.js",
   "repository": {
