@@ -1,4 +1,5 @@
 const { mapRange } = require('canvas-sketch-util/math')
+const { clipPolylinesToBox } = require('canvas-sketch-util/geometry');
 const {contain} = require('./intrinsic-scale')
 
 const defaultConfig = {
@@ -78,7 +79,7 @@ class GCodeFile {
 
   moveTo(x, y) {
     const coords = this.mapCoordsToDrawArea(x, y)
-    this.gcode += `\n${this.config.offCommand}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
+    this.gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
   }
 
   drawLine(x, y) {
@@ -87,7 +88,12 @@ class GCodeFile {
   }
 
   addPolylines(polylines) {
-    polylines.forEach(l => {
+    const lines = clipPolylinesToBox(
+      polylines, 
+      [0, 0, this.coordsWidth, this.coordsHeight]
+    )
+    
+    lines.forEach(l => {
       l.forEach((point, i) => {
         if (i == 0) {
           this.moveTo(point[0], point[1])
