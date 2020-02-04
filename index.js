@@ -1,5 +1,5 @@
 const { mapRange } = require('canvas-sketch-util/math')
-const { clipPolylinesToBox } = require('canvas-sketch-util/geometry');
+const { clipPolylinesToBox } = require('canvas-sketch-util/geometry')
 const {contain} = require('./intrinsic-scale')
 
 const defaultConfig = {
@@ -10,7 +10,9 @@ const defaultConfig = {
   powerDelay: 0.2,
   fileName: 'sketch.gcode',
   paperSize: [210, 297],
-  margin: 10
+  margin: 10,
+  invertX: false,
+  invertY: false
 }
 
 class GCodeFile {
@@ -27,15 +29,15 @@ class GCodeFile {
     this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
   }
 
-  normalizeMargin(){
-    if(typeof this.config.margin === "number"){
-      this.config.margin = [this.config.margin,this.config.margin,this.config.margin,this.config.margin]
-    }else if(Array.isArray(this.config.margin)){
-      if(this.config.margin.length === 2){
+  normalizeMargin() {
+    if (typeof this.config.margin === 'number') {
+      this.config.margin = [this.config.margin, this.config.margin, this.config.margin, this.config.margin]
+    } else if (Array.isArray(this.config.margin)) {
+      if (this.config.margin.length === 2) {
         this.config.margin[2] = this.config.margin[0]
         this.config.margin[3] = this.config.margin[1]
       }
-    }else{
+    } else {
       throw new Error('Margin option can be a number or an array.')
     }
   }
@@ -66,11 +68,20 @@ class GCodeFile {
     if (!this.coordsHeight) {
       throw new Error('Must call "updateCoordsArea" passing width and height of your coordinate system!')
     }
+
     const coords = {
       x: this.config.margin[0] + this.offsetX + mapRange(x, 0, this.coordsWidth, 0, this.drawWidth, true),
       y: this.config.margin[1] + this.offsetY + mapRange(y, 0, this.coordsHeight, 0, this.drawHeight, true)
     }
-    
+
+    if (this.config.invertX) {
+      coords.x = this.drawWidth - coords.x
+    }
+
+    if (this.config.invertY) {
+      coords.y = this.drawHeight - coords.y
+    }
+
     coords.x = parseFloat(coords.x.toFixed(3))
     coords.y = parseFloat(coords.y.toFixed(3))
 
@@ -89,10 +100,10 @@ class GCodeFile {
 
   addPolylines(polylines) {
     const lines = clipPolylinesToBox(
-      polylines, 
+      polylines,
       [0, 0, this.coordsWidth, this.coordsHeight]
     )
-    
+
     lines.forEach(l => {
       l.forEach((point, i) => {
         if (i == 0) {

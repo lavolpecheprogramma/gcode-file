@@ -22,7 +22,9 @@ const gCode = new GCodeFile({
 	powerDelay: 0.2,
 	fileName: 'sketch.gcode',
 	paperSize: [210, 297], // A4 size in mm
-  	margin: 10 
+	margin: 10,
+  invertX: false,
+  invertY: false
 })
 
 // ... your canvas setup ...
