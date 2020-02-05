@@ -74,12 +74,12 @@ class GCodeFile {
       y: this.config.margin[1] + this.offsetY + mapRange(y, 0, this.coordsHeight, 0, this.drawHeight, true)
     }
 
-    if (this.config.invertX) {
-      coords.x = this.drawWidth - coords.x
+    if (this.config.flipX) {
+      coords.x = this.config.paperSize[0] - coords.x
     }
 
-    if (this.config.invertY) {
-      coords.y = this.drawHeight - coords.y
+    if (this.config.flipY) {
+      coords.y = this.config.paperSize[1] - coords.y
     }
 
     coords.x = parseFloat(coords.x.toFixed(3))
@@ -116,7 +116,7 @@ class GCodeFile {
   }
 
   closeFile() {
-    this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1\nM18`
+    this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1`
   }
 
   downloadFile() {
