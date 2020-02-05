@@ -12,7 +12,7 @@ const defaultConfig = {
   paperSize: [210, 297],
   margin: 10,
   flipX: false,
-  flipX: false
+  flipY: false
 }
 
 class GCodeFile {
