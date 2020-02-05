@@ -11,8 +11,8 @@ const defaultConfig = {
   fileName: 'sketch.gcode',
   paperSize: [210, 297],
   margin: 10,
-  invertX: false,
-  invertY: false
+  flipX: false,
+  flipX: false
 }
 
 class GCodeFile {
