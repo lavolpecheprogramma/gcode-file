@@ -1,6 +1,6 @@
 const { mapRange } = require('canvas-sketch-util/math')
 const { clipPolylinesToBox } = require('canvas-sketch-util/geometry')
-const {contain} = require('./intrinsic-scale')
+const { contain } = require('./intrinsic-scale')
 
 const defaultConfig = {
   feedRate: 8000,
@@ -22,11 +22,8 @@ class GCodeFile {
       ...config
     }
     this.normalizeMargin()
-    this.drawArea = [
-      this.config.paperSize[0] - this.config.margin[0] - this.config.margin[2],
-      this.config.paperSize[1] - this.config.margin[1] - this.config.margin[3]
-    ]
-    this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
+    this.updateDrawArea()
+    this.beginFile()
   }
 
   normalizeMargin() {
@@ -40,6 +37,24 @@ class GCodeFile {
     } else {
       throw new Error('Margin option can be a number or an array.')
     }
+  }
+
+  updateConfig(config = {}){
+    this.config = {
+      ...this.config,
+      ...config
+    }
+
+    this.normalizeMargin()
+    this.updateDrawArea()
+    this.beginFile()
+  }
+
+  updateDrawArea(){
+    this.drawArea = [
+      this.config.paperSize[0] - this.config.margin[0] - this.config.margin[2],
+      this.config.paperSize[1] - this.config.margin[1] - this.config.margin[3]
+    ]
   }
 
   updateCoordsArea(width, height) {
@@ -113,6 +128,10 @@ class GCodeFile {
         }
       })
     })
+  }
+
+  beginFile() {
+    this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
   }
 
   closeFile() {
