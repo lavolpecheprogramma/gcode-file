@@ -49,3 +49,29 @@ window.addEventListener('keydown', function(){
     return false;
   }
 })
+```
+
+## Methods
+
+### updateConfig(newConfig)
+Accepts an object with the new config (or a part of it). It is useful if you modify your sketch size or print settings at runtime with a gui for example.
+
+### updateCoordsArea(width, height)
+Update the dimension of your drawing area. It is necessary to know how map the coordinates of your paths to the paper dimension.
+
+### moveTo(x, y)
+Wrap all the command to move the plot without draw
+
+### drawLine(x, y)
+Wrap all the command to move the plot drawing
+
+### addPolylines(polylines)
+Accepts an array on polylines and generate all the commands to draw the polylines.
+
+### downloadFile()
+Generate and download the gcode file
+
+
+
+
+
