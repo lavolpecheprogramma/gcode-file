@@ -39,7 +39,7 @@ class GCodeFile {
     }
   }
 
-  updateConfig(config = {}){
+  updateConfig(config = {}) {
     this.config = {
       ...this.config,
       ...config
@@ -50,7 +50,7 @@ class GCodeFile {
     this.beginFile()
   }
 
-  updateDrawArea(){
+  updateDrawArea() {
     this.drawArea = [
       this.config.paperSize[0] - this.config.margin[0] - this.config.margin[2],
       this.config.paperSize[1] - this.config.margin[1] - this.config.margin[3]
