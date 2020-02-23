@@ -135,7 +135,7 @@ class GCodeFile {
   }
 
   closeFile() {
-    this.gcode += `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1`
+    this.gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X0 Y0\nG4 P1`
   }
 
   downloadFile() {
