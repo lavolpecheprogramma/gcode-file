@@ -8,7 +8,7 @@ const defaultConfig = {
   onCommand: 'M03S20',
   offCommand: 'M03S0',
   powerDelay: 0.2,
-  fileName: 'sketch.gcode',
+  fileName: 'sketch',
   paperSize: [210, 297],
   margin: 10,
   flipX: false,
@@ -23,7 +23,20 @@ class GCodeFile {
     }
     this.normalizeMargin()
     this.updateDrawArea()
-    this.beginFile()
+    this.clear()
+  }
+
+  clear(){
+    this.layers = []
+    this.addLayer()
+  }
+
+  addLayer(name = ''){
+    this.layers.push({
+      name,
+      gcode: ''
+    })
+    this.currentLayer = this.layers.length - 1
   }
 
   normalizeMargin() {
@@ -47,7 +60,6 @@ class GCodeFile {
 
     this.normalizeMargin()
     this.updateDrawArea()
-    this.beginFile()
   }
 
   updateDrawArea() {
@@ -105,12 +117,12 @@ class GCodeFile {
 
   moveTo(x, y) {
     const coords = this.mapCoordsToDrawArea(x, y)
-    this.gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
+    this.layers[this.currentLayer].gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
   }
 
   drawLine(x, y) {
     const coords = this.mapCoordsToDrawArea(x, y)
-    this.gcode += `\nG1 X${coords.x} Y${coords.y}`
+    this.layers[this.currentLayer].gcode += `\nG1 X${coords.x} Y${coords.y}`
   }
 
   addPolylines(polylines) {
@@ -131,25 +143,25 @@ class GCodeFile {
   }
 
   beginFile() {
-    this.gcode = `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
+    return `G0 F${this.config.seekRate}\nG1 F${this.config.feedRate}\nG90\nG21`
   }
 
   closeFile() {
-    this.gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X0 Y0\nG4 P1`
+    return `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1`
   }
 
   downloadFile() {
-    this.closeFile()
-
-    // from https://stackoverflow.com/a/38019175
-    const gcodeBlob = new Blob([this.gcode], { type: 'text/plain;charset=utf-8' })
-    const gcodeUrl = URL.createObjectURL(gcodeBlob)
-    const downloadLink = document.createElement('a')
-    downloadLink.href = gcodeUrl
-    downloadLink.download = this.config.fileName
-    document.body.appendChild(downloadLink)
-    downloadLink.click()
-    document.body.removeChild(downloadLink)
+    this.layers.forEach(layer => {
+      // from https://stackoverflow.com/a/38019175
+      const gcodeBlob = new Blob([this.beginFile()+layer.gcode+this.closeFile()], { type: 'text/plain;charset=utf-8' })
+      const gcodeUrl = URL.createObjectURL(gcodeBlob)
+      const downloadLink = document.createElement('a')
+      downloadLink.href = gcodeUrl
+      downloadLink.download = this.config.fileName + (layer.name ? `-${layer.name}` : '') + '.gcode'
+      document.body.appendChild(downloadLink)
+      downloadLink.click()
+      document.body.removeChild(downloadLink)
+    })
   }
 }
 
