@@ -20,7 +20,7 @@ const gCode = new GCodeFile({
 	onCommand: 'M03S20',
 	offCommand: 'M03S0',
 	powerDelay: 0.2,
-	fileName: 'sketch.gcode',
+	fileName: 'sketch',
 	paperSize: [210, 297], // A4 size in mm
 	margin: 10,
 	flipX: false,
@@ -67,6 +67,9 @@ Wrap all the command to move the plot drawing
 
 ### addPolylines(polylines)
 Accepts an array on polylines and generate all the commands to draw the polylines.
+
+### addLayer(name)
+Add layer to save on separate file.
 
 ### downloadFile()
 Generate and download the gcode file
