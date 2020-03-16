@@ -69,7 +69,7 @@ Wrap all the command to move the plot drawing
 Accepts an array on polylines and generate all the commands to draw the polylines.
 
 ### addLayer(name)
-Add layer to save on separate file.
+Add layer that will be saved on separate file.
 
 ### downloadFile()
 Generate and download the gcode file
