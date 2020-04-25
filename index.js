@@ -3,8 +3,8 @@ const { clipPolylinesToBox } = require('canvas-sketch-util/geometry')
 const { contain } = require('./intrinsic-scale')
 
 const defaultConfig = {
-  feedRate: 8000,
-  seekRate: 8000,
+  feedRate: 8000, // G1 movement (drawing speed)
+  seekRate: 8000, // G0 movement (no drawing speed)
   onCommand: 'M03S20',
   offCommand: 'M03S0',
   powerDelay: 0.2,
@@ -117,7 +117,7 @@ class GCodeFile {
 
   moveTo(x, y) {
     const coords = this.mapCoordsToDrawArea(x, y)
-    this.layers[this.currentLayer].gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG1 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
+    this.layers[this.currentLayer].gcode += `\n${this.config.offCommand}\nG4 P${this.config.powerDelay}\nG0 X${coords.x} Y${coords.y}\n${this.config.onCommand}\nG4 P${this.config.powerDelay}`
   }
 
   drawLine(x, y) {
@@ -147,7 +147,7 @@ class GCodeFile {
   }
 
   closeFile() {
-    return `\n${this.config.offCommand}\nG1 X0 Y0\nG4 P1`
+    return `\n${this.config.offCommand}\nG4 P1\nG0 X0 Y0\nG4 P1`
   }
 
   downloadFile() {

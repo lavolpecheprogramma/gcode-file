@@ -15,14 +15,14 @@ npm i --save @gcode-file
 const { createPath, pathsToPolylines } = require('canvas-sketch-util/penplot');
 const GCodeFile = require('gcode-file');
 const gCode = new GCodeFile({
-	feedRate: 8000,
-	seekRate: 8000,
+	feedRate: 8000, // G1 movement (drawing speed)
+  seekRate: 8000, // G0 movement (no drawing speed)
 	onCommand: 'M03S20',
 	offCommand: 'M03S0',
 	powerDelay: 0.2,
 	fileName: 'sketch',
 	paperSize: [210, 297], // A4 size in mm
-	margin: 10,
+	margin: 10, // or [10, 10] (top/bottom and left/right margin) or [10,10,10,10] (top/left/bottom/right)
 	flipX: false,
 	flipY: false
 })
